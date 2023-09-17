@@ -1,0 +1,1 @@
+CREATE DATABASE "db-go-clean-architecture"

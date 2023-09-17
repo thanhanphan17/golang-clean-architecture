@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  app:
+    container_name: go-clean-architecture
+    
+    build: 
+      dockerfile: Dockerfile
+      context: .
+    
+    image: go-clean-architecture:1.0
+    
+    ports:
+      - "8888:8888"
+
+    networks:
+      - localnet
+
+networks:
+  localnet:
