@@ -9,6 +9,7 @@ import (
 	"go-clean-architecture/middleware"
 	"os"
 	"strconv"
+	"time"
 
 	helmet "github.com/danielkov/gin-helmet"
 	"github.com/gin-contrib/cors"
@@ -37,6 +38,10 @@ func Run() {
 	flag.Parse()
 
 	setEnv(flagArg)
+
+	if os.Getenv("CONFIG_ENV") != "local" {
+		time.Sleep(time.Second * 5)
+	}
 
 	appConfig := config.InitLoadAppConf()
 
