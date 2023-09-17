@@ -11,9 +11,14 @@ import (
 	"strconv"
 	"time"
 
-	helmet "github.com/danielkov/gin-helmet"
+	_ "go-clean-architecture/docs"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	helmet "github.com/danielkov/gin-helmet"
 )
 
 func setEnv(flagArg *FlagArgument) {
@@ -74,6 +79,7 @@ func Run() {
 		},
 	))
 
+	appRouter.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	apis.SetupRouter(appRouter, *dbInstance, *appConfig)
 
 	if err := appRouter.Run(

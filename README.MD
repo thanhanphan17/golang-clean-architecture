@@ -10,7 +10,21 @@
 -   JWT
 -   Docker
 
-### II. Prepare database
+### II. Swagger
+
+#### 1. Install Swag
+
+```python
+    go install github.com/swaggo/swag/cmd/swag@latest
+```
+
+#### 2. Init swagger
+
+```python
+    swag init -g cmd/main.go
+```
+
+### III. Prepare database
 
 #### 1. Create postgres database using Docker
 
@@ -24,7 +38,7 @@
     make  rm_db
 ```
 
-### III. Run application
+### IV. Run application
 
 #### 1. Run with migration database
 
@@ -38,7 +52,7 @@
     make local m=false
 ```
 
-### IV. Run with Docker
+### V. Run with Docker
 
 #### 1. Compose up
 

@@ -27,6 +27,16 @@ func (c createUserController) processCreateUser(
 	return c.createUserUseCase.Execute(ctx, mapper.TranformCreateUserReq(req))
 }
 
+// CreateUser godoc
+// @Summary Create user account
+// @Tags user-service
+// @Accept  json
+// @Produce  json
+// @Param data body req.CreateUserReq true "user"
+// @Success      200 {object}  res.OK
+// @failure		 400 {object} cerr.AppError
+// @failure		 500 {object} cerr.AppError
+// @Router /user/create [post]
 func (h UserHandler) HandleCreateUser(c *gin.Context) {
 	var createUserReq req.CreateUserReq
 

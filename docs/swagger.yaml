@@ -1,0 +1,89 @@
+basePath: /api/v1
+definitions:
+  cerr.AppError:
+    properties:
+      error_key:
+        type: string
+      log:
+        type: string
+      message:
+        type: string
+      request_id:
+        type: string
+      status_code:
+        type: integer
+    type: object
+  req.CreateUserReq:
+    properties:
+      name:
+        maxLength: 30
+        minLength: 10
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    required:
+    - name
+    - password
+    - phone
+    type: object
+  res.OK:
+    properties:
+      data: {}
+      message:
+        type: string
+      request_id:
+        type: string
+      status_code:
+        type: integer
+    type: object
+host: localhost:8888
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: More
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: CLEAN-EXAMPLE API
+  version: "1.0"
+paths:
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: user
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.CreateUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/res.OK'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+      summary: Create user account
+      tags:
+      - user-service
+securityDefinitions:
+  jwt:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
