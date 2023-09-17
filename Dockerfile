@@ -29,4 +29,4 @@ COPY config/env /config/env
 EXPOSE 8888
 
 # Run the application
-CMD ["/app", "-config", "./config/env", "-env=local", "-upgrade=false"]
+CMD ["/app", "-config", "./config/env", "-env=prod", "-upgrade=false"]

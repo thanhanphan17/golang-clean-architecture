@@ -1,12 +1,30 @@
 version: '3.7'
 
 services:
+  postgres:
+    container_name: postgres-db
+    image: postgres:latest
+    volumes:
+      - "./data/data.sql:/docker-entrypoint-initdb.d/data.sql "
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "0000"
+      POSTGRES_DB: "db-go-clean-architecture"
+    ports:
+      - "5432:5432"
+
+    networks:
+      - localnet
+
   app:
     container_name: go-clean-architecture
     
     build: 
       dockerfile: Dockerfile
       context: .
+    
+    depends_on:
+      - postgres
     
     image: go-clean-architecture:1.0
     
