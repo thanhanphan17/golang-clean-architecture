@@ -41,15 +41,15 @@ definitions:
 host: localhost:8888
 info:
   contact:
-    email: support@swagger.io
+    email: thanhanphan17@gmail.com
     name: API Support
     url: http://www.swagger.io/support
-  description: More
+  description: Simple implementation of clean architecture
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: CLEAN-EXAMPLE API
+  title: Golang Clean Architecture Example
   version: "1.0"
 paths:
   /user/create:

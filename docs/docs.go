@@ -13,7 +13,7 @@ const docTemplate = `{
         "contact": {
             "name": "API Support",
             "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "email": "thanhanphan17@gmail.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -143,8 +143,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8888",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "CLEAN-EXAMPLE API",
-	Description:      "More",
+	Title:            "Golang Clean Architecture Example",
+	Description:      "Simple implementation of clean architecture",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
