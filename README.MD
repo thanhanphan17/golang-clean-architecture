@@ -1,5 +1,10 @@
 # A Simple Clean Architecture Implementation In Golang
 
+> <p style='text-align: justify;'> 
+> Clean Architecture is a software architectural pattern designed to create scalable, maintainable, and testable applications using the Go programming language. It enforces a clear separation of concerns, making it easier to develop and maintain complex software systems.
+
+</p>
+
 ![alt text](statics/clean-img.webp "Title")
 
 ### I. Tech stack:
