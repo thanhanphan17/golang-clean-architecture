@@ -1,32 +1,56 @@
-# Use a smaller Alpine image as the base image
-FROM golang:1.21.0-alpine AS build
+##### Stage 1 #####
 
-# Install required dependencies
-RUN apk update && apk add --no-cache git
+### Use golang:1.19 as base image for building the application
+FROM golang:1.21-alpine as builder
 
-# Set the working directory
-WORKDIR /go/src/go-clean-architecture
+RUN apk --no-cache add tzdata
+# CERT PACKAGES
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache \
+    ca-certificates \
+    && update-ca-certificates 2>/dev/null || true 
 
-# Copy only the Go module files and download dependencies separately
-COPY go.mod go.sum ./
+### Create new directly and set it as working directory
+RUN mkdir -p /project
+WORKDIR /project
+
+### Copy Go application dependency files
+COPY go.mod .
+COPY go.sum .
+
+### Download Go application module dependencies
 RUN go mod download
 
-# Copy the rest of the application code
+### Copy actual source code for building the application
 COPY . .
 
-# Build the Go application
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app ./cmd
+### CGO has to be disabled cross platform builds
+### Otherwise the application won't be able to start
+ENV CGO_ENABLED=0
 
-# Create a minimal image
-FROM alpine:3.14
-LABEL maintainer="ptan <thanhanphan17@gmail.com>"
+### Build the Go app for a linux OS
+### 'scratch' and 'alpine' both are Linux distributions
 
-# Copy the built binary from the build image
-COPY --from=build /app /app
-COPY config/env /config/env
+RUN GOOS=linux go build -o app cmd/main.go
 
-# Expose the port the application will run on
-EXPOSE 8888
+##### Stage 2 #####
 
-# Run the application
-CMD ["/app", "-config", "./config/env", "-env=prod", "-upgrade=false"]
+### Define the running image
+FROM scratch
+
+### Set working directory
+WORKDIR /dist
+
+### Copy built binary application from 'builder' image
+COPY --from=builder /project/app .
+COPY --from=builder /project/config ./config
+
+# copy the ca-certificate.crt from the build stage
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+
+ENV TZ=Asia/Ho_Chi_Minh
+
+
+### Run the binary application
+CMD ["./app", "-config", "./config/env", "-env=prod", "-upgrade=true"]
