@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"go-clean-architecture/common"
 	cerr "go-clean-architecture/common/error"
+	"go-clean-architecture/common/requester"
 	"go-clean-architecture/config"
 	"go-clean-architecture/provider/tokenprovider/jwt"
 	"strings"
@@ -39,7 +39,7 @@ func RequireJWT(cfg *config.AppConfig) func(ctx *gin.Context) {
 			panic(err)
 		}
 
-		requester := common.JWTRequesterData{
+		requesterData := requester.JWTRequester{
 			ID:   payload.UserID,
 			Role: payload.Role,
 		}
@@ -48,7 +48,7 @@ func RequireJWT(cfg *config.AppConfig) func(ctx *gin.Context) {
 			panic(err)
 		}
 
-		c.Set(common.CurrentRequester, requester)
+		c.Set(requester.CurrentRequester, requesterData)
 		c.Next()
 	}
 }
