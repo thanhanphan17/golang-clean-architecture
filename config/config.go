@@ -30,6 +30,12 @@ type AppConfig struct {
 	VerifyTokenExpiry  int    `mapstructure:"VERIFY_TOKEN_EXPIRY"`
 	AccessTokenExpiry  int    `mapstructure:"ACCESS_TOKEN_EXPIRY"`
 	RefreshTokenExpiry int    `mapstructure:"REFRESH_TOKEN_EXPIRY"`
+
+	// mail info
+	MailFrom   string `mapstructure:"MAIL_FROM"`
+	MailServer string `mapstructure:"MAIL_SERVER"`
+	MailPort   int    `mapstructure:"MAIL_PORT"`
+	MailPass   string `mapstructure:"MAIL_PASS"`
 }
 
 func InitLoadAppConf() *AppConfig {
