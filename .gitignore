@@ -1,3 +1,4 @@
 go.sum
 postgres-data
 config/env/prod.env
+.idea

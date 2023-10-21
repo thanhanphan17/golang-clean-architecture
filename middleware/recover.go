@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"fmt"
 	cerr "go-clean-architecture/common/error"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,6 +12,8 @@ func Recover() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
+				slog.Info(fmt.Sprintf("Panic occurred: %s\n", err))
+
 				// Avoid case that response result type is text
 				c.Header("Content-Type", "application/json")
 

@@ -1,58 +1,58 @@
 package utils
 
 import (
-	"regexp"
-	"strings"
+	"unicode"
 
 	"github.com/go-playground/validator/v10"
 )
 
+// PasswordValidator checks if the given password meets the required criteria.
 func PasswordValidator(fl validator.FieldLevel) bool {
 	password := fl.Field().String()
-	// Check for minimum length (e.g., 8 characters)
-	if len(password) < 8 {
-		return false
-	}
 
-	// Check for at least one uppercase letter
-	if !containsUppercase(password) {
-		return false
-	}
-
-	// Check for at least one lowercase letter
-	if !containsLowercase(password) {
-		return false
-	}
-
-	// Check for at least one digit
-	if !containsDigit(password) {
-		return false
-	}
-
-	// Check for at least one special character (e.g., !@#$%^&*)
-	if !containsSpecialCharacter(password) {
-		return false
-	}
-
-	return true
+	return len(password) >= 8 &&
+		containsUppercase(password) &&
+		containsLowercase(password) &&
+		containsDigit(password) &&
+		containsSpecialCharacter(password)
 }
 
-// Helper functions to check for character types
-func containsUppercase(s string) bool {
-	return strings.ContainsAny(s, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+// containsUppercase checks if the password contains at least one uppercase letter.
+func containsUppercase(password string) bool {
+	for _, char := range password {
+		if unicode.IsUpper(char) {
+			return true
+		}
+	}
+	return false
 }
 
-func containsLowercase(s string) bool {
-	return strings.ContainsAny(s, "abcdefghijklmnopqrstuvwxyz")
+// containsLowercase checks if the password contains at least one lowercase letter.
+func containsLowercase(password string) bool {
+	for _, char := range password {
+		if unicode.IsLower(char) {
+			return true
+		}
+	}
+	return false
 }
 
-func containsDigit(s string) bool {
-	return strings.ContainsAny(s, "0123456789")
+// containsDigit checks if the password contains at least one digit.
+func containsDigit(password string) bool {
+	for _, char := range password {
+		if unicode.IsDigit(char) {
+			return true
+		}
+	}
+	return false
 }
 
-func containsSpecialCharacter(s string) bool {
-	// Define a regular expression to match special characters
-	specialCharacterPattern := `[!@#$%^&*()_+{}\[\]:;<>,.?~]`
-	match, _ := regexp.MatchString(specialCharacterPattern, s)
-	return match
+// containsSpecialCharacter checks if the password contains at least one special character.
+func containsSpecialCharacter(password string) bool {
+	for _, char := range password {
+		if !unicode.IsLetter(char) && !unicode.IsDigit(char) {
+			return true
+		}
+	}
+	return false
 }

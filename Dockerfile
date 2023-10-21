@@ -1,6 +1,6 @@
 ##### Stage 1 #####
 
-### Use golang:1.19 as base image for building the application
+### Use golang:1.21 as base image for building the application
 FROM golang:1.21-alpine as builder
 
 RUN apk --no-cache add tzdata
@@ -33,7 +33,6 @@ ENV CGO_ENABLED=0
 ### 'scratch' and 'alpine' both are Linux distributions
 
 RUN GOOS=linux go build -o app cmd/main.go
-
 ##### Stage 2 #####
 
 ### Define the running image
@@ -45,9 +44,12 @@ WORKDIR /dist
 ### Copy built binary application from 'builder' image
 COPY --from=builder /project/app .
 COPY --from=builder /project/config ./config
+COPY --from=builder /project/utils ./utils
+COPY --from=builder /project/go.mod .
 
 # copy the ca-certificate.crt from the build stage
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ENV TZ=Asia/Ho_Chi_Minh
 

@@ -1,17 +1,23 @@
 package migration
 
 import (
-	usrentity "go-clean-architecture/internal/user/business/entity"
+	userEntity "go-clean-architecture/internal/user/business/entity"
 
 	"gorm.io/gorm"
 )
 
-func Migration(db *gorm.DB) {
+// Migration is a function that performs database migration for the User entity.
+// It takes a *gorm.DB as a parameter and returns an error if the migration fails.
+func Migration(db *gorm.DB) error {
+	// db.Migrator().DropTable(
+	// 	userEntity.User{},
+	// )
+
+	// Perform automatic migration for entities
 	err := db.AutoMigrate(
-		usrentity.User{},
+		userEntity.User{},
 	)
 
-	if err != nil {
-		return
-	}
+	// Return the error if migration fails
+	return err
 }

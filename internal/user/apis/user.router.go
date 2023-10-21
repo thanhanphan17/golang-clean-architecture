@@ -5,41 +5,62 @@ import (
 	"go-clean-architecture/db"
 	"go-clean-architecture/internal/user/apis/handler"
 	"go-clean-architecture/internal/user/repository"
+	"go-clean-architecture/middleware"
+	"go-clean-architecture/provider/hashprovider"
 	"go-clean-architecture/provider/tokenprovider/jwt"
+	tokentype "go-clean-architecture/provider/tokenprovider/type"
 	utils "go-clean-architecture/utils/validator"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(engine *gin.Engine, db db.Database, appConfig config.AppConfig) {
-	// create repository instance
-	userFinder := repository.NewUserFinderImpl(db)
-	userWritter := repository.NewUserWriterImpl(db)
-	repo := *repository.NewUserRepository(userFinder, userWritter)
+// SetupRouter sets up the router for the application.
+// It initializes the necessary dependencies and handlers.
+func setUpHandler(db db.Database, appConfig config.AppConfig) *handler.UserHandler {
+	// Create the user repository with the database
+	repo := *repository.NewUserRepository(
+		repository.NewUserFinderImpl(db),
+		repository.NewUserWriterImpl(db),
+	)
 
-	// jwt init
-	tokenProvider := jwt.NewTokenJWTProvider(appConfig.JWTSecretKey)
-	verifyTime := appConfig.VerifyTokenExpiry
-	accessTime := appConfig.AccessTokenExpiry
+	// Create the JWT token provider with the secret key from the app configuration
+	tokenProvider := jwt.NewJWTProvider(appConfig.JWTSecretKey)
 
-	// validate incoming request
+	// Create the request validator
 	validatorRequest := utils.NewValidator()
 
-	// handler user
-	handler := handler.NewUserHandler(
+	md5Hash := hashprovider.NewMd5Hash()
+
+	// Create the user handler with the repository, request validator,
+	// token provider, and token expiry settings from the app configuration
+	userHandler := handler.NewUserHandler(
 		repo,
 		validatorRequest,
 		tokenProvider,
-		verifyTime,
-		accessTime,
+		appConfig.VerifyTokenExpiry,
+		appConfig.AccessTokenExpiry,
+		md5Hash,
 	)
 
-	initRouter(engine, *handler)
+	return userHandler
 }
 
-func initRouter(engine *gin.Engine, handler handler.UserHandler) {
-	v1 := engine.Group("api/v1")
+func InitRouter(engine *gin.Engine, db db.Database, appConfig config.AppConfig) {
+	userHandler := setUpHandler(db, appConfig)
+
+	route := engine.Group("/api/v1/user")
 	{
-		v1.POST("user/create", handler.HandleCreateUser)
+		route.POST("/register", userHandler.HandleCreateUser)
+		route.POST("/login", userHandler.HandleLoginUser)
+		route.GET("/verify", userHandler.HandleVerifyUser)
+		route.POST("/comfirm-verify",
+			middleware.RequireAuthorization(&appConfig, tokentype.VERIFY_TOKEN.Value()),
+			userHandler.HandleConfirmVerifyUser,
+		)
+
+		route.GET("/otp-resend",
+			middleware.RequireAuthorization(&appConfig, tokentype.VERIFY_TOKEN.Value()),
+			userHandler.HandleSendOTP,
+		)
 	}
 }

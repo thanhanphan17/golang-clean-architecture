@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	cerr "go-clean-architecture/common/error"
 	paging "go-clean-architecture/common/pagination"
 	"go-clean-architecture/db"
@@ -14,37 +15,18 @@ type userFinderImpl struct {
 	db db.Database
 }
 
-// FindUserByID implements UserRepoFinder.
-func (u *userFinderImpl) FindUserByID(
-	ctx context.Context,
-	userID string,
-) (*entity.User, error) {
+func (repo *userFinderImpl) FindUserByCondition(ctx context.Context,
+	condition map[string]interface{}, preloadKey ...string) (*entity.User, error) {
 	userEntity := entity.User{}
+	db := repo.db.Executor.Model(&userEntity)
 
-	if err := u.db.Executor.
-		Where("id = ?", userID).
-		First(&userEntity).Error; err != nil {
-		if err != gorm.ErrRecordNotFound {
-			return nil, cerr.ErrRecordNotFound(nil)
-		}
-
-		return nil, cerr.ErrDB(err)
+	// Preload all keys
+	for _, key := range preloadKey {
+		db = db.Preload(key)
 	}
 
-	return &userEntity, nil
-}
-
-// FindUserByPhone implements UserRepoFinder.
-func (u *userFinderImpl) FindUserByPhone(
-	ctx context.Context,
-	phone string,
-) (*entity.User, error) {
-	userEntity := entity.User{}
-
-	if err := u.db.Executor.
-		Where("phone = ?", phone).
-		First(&userEntity).Error; err != nil {
-		if err != gorm.ErrRecordNotFound {
+	if err := db.Where(condition).First(&userEntity).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, cerr.ErrRecordNotFound(nil)
 		}
 
@@ -55,13 +37,25 @@ func (u *userFinderImpl) FindUserByPhone(
 }
 
 // FindUsers implements UserRepoFinder.
-func (u *userFinderImpl) FindUsers(
-	ctx context.Context,
-	filter entity.User,
-	page int,
-	limit int,
-) (paging.Pagination, error) {
-	panic("unimplemented")
+func (repo *userFinderImpl) FindAllUsers(ctx context.Context,
+	filter *entity.Filter, pagination *paging.Pagination) (*paging.Pagination, error) {
+	var users []*entity.User
+
+	db := repo.db.Executor.
+		Table(entity.User{}.TableName())
+
+	db = db.Scopes(applyFilterScope(filter))
+
+	if err := db.
+		Scopes(paging.Paginate(users, pagination, db)).
+		Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	pagination.Rows = users
+
+	return pagination, nil
+
 }
 
 var _ userRepoFinder = (*userFinderImpl)(nil)

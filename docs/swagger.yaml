@@ -13,30 +13,41 @@ definitions:
       status_code:
         type: integer
     type: object
+  common.SuccessRes:
+    properties:
+      data: {}
+      message:
+        type: string
+      status_code:
+        type: integer
+    type: object
   req.CreateUserReq:
     properties:
+      email:
+        type: string
       name:
         maxLength: 30
         minLength: 10
         type: string
       password:
         type: string
-      phone:
+      role:
         type: string
     required:
+    - email
     - name
     - password
-    - phone
+    - role
     type: object
-  res.OK:
+  req.LoginUserReq:
     properties:
-      data: {}
-      message:
+      email:
         type: string
-      request_id:
+      password:
         type: string
-      status_code:
-        type: integer
+    required:
+    - email
+    - password
     type: object
 host: localhost:8888
 info:
@@ -52,10 +63,98 @@ info:
   title: Golang Clean Architecture Example
   version: "1.0"
 paths:
-  /user/create:
+  /user/confirm-verify:
     post:
       consumes:
       - application/json
+      description: Verify a user with the by OTP.
+      parameters:
+      - description: OTP code
+        in: query
+        name: otp
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+      security:
+      - JWT: []
+      summary: Verify user with OTP
+      tags:
+      - user-service
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user account with "email" and "password"
+      parameters:
+      - description: user
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.LoginUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+      summary: Login user account
+      tags:
+      - user-service
+  /user/otp-resend:
+    get:
+      consumes:
+      - application/json
+      description: Resend One-Time-Password (use verify token responsed from verify
+        API)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+      security:
+      - JWT: []
+      summary: Resend OTP
+      tags:
+      - user-service
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Create user account with "email", "name" and "password"
       parameters:
       - description: user
         in: body
@@ -69,7 +168,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/res.OK'
+            $ref: '#/definitions/common.SuccessRes'
         "400":
           description: Bad Request
           schema:
@@ -79,6 +178,35 @@ paths:
           schema:
             $ref: '#/definitions/cerr.AppError'
       summary: Create user account
+      tags:
+      - user-service
+  /user/verify:
+    get:
+      consumes:
+      - application/json
+      description: Verify user email
+      parameters:
+      - description: user's email
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.SuccessRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/cerr.AppError'
+      summary: Verify user
       tags:
       - user-service
 securityDefinitions:

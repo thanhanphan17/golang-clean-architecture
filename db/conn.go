@@ -25,16 +25,27 @@ type Connection struct {
 	ConnectionOptions           []ConnectionOption
 }
 
+// CombineInstance combines the host and port of the connection
+// along with the host and port of any fallback connections
+// and returns a comma-separated string of all the combined instances.
 func (c Connection) CombineInstance() string {
-	i := []string{fmt.Sprintf("%s:%s", c.Host, c.Port)}
+	// Create a slice to store the combined instances
+	instances := []string{fmt.Sprintf("%s:%s", c.Host, c.Port)}
+
+	// Iterate over the fallback connections
 	for _, v := range c.FallbackConnections {
-		i = append(i, fmt.Sprintf("%s:%s", v.Host, v.Port))
+		// Append the host and port of each fallback connection to the slice
+		instances = append(instances, fmt.Sprintf("%s:%s", v.Host, v.Port))
 	}
 
-	return strings.Trim(strings.Join(i, ","), ",")
+	// Join all the instances with a comma and remove any leading/trailing commas
+	return strings.Trim(strings.Join(instances, ","), ",")
 }
 
-func (c Connection) ToConnectionString() string {
+// ToConnectionString returns the PostgreSQL connection string based on the Connection struct.
+func (c Connection) ToPostgresConnectionString() string {
+	// Construct the base connection string with user, password, instance, database, and SSL mode.
+	// Use fmt.Sprintf to format the string.
 	s := fmt.Sprintf("postgresql://%s:%s@%s/%s?TimeZone=Asia/Ho_Chi_Minh&sslmode=%s",
 		c.User,
 		c.Password,
@@ -42,15 +53,19 @@ func (c Connection) ToConnectionString() string {
 		c.Database,
 		c.SSLMode)
 
+	// Check if SSL mode is not Disable.
 	if c.SSLMode != Disable {
+		// Append the SSL root certificate to the connection string if provided.
 		if c.SSLCertAuthorityCertificate != "" {
 			s += fmt.Sprintf("&sslrootcert=%s", c.SSLCertAuthorityCertificate)
 		}
 
+		// Append the SSL public certificate to the connection string if provided.
 		if c.SSLPublicCertificate != "" {
 			s += fmt.Sprintf("&sslcert=%s", c.SSLPublicCertificate)
 		}
 
+		// Append the SSL private key to the connection string if provided.
 		if c.SSLPrivateKey != "" {
 			s += fmt.Sprintf("&sslkey=%s", c.SSLPrivateKey)
 		}
@@ -66,6 +81,14 @@ type FallbackConnection struct {
 
 type ConnectionOption func(*Connection)
 
+// SetConnection returns a ConnectionOption function that sets the host and port of a Connection struct.
+//
+// Parameters:
+//   - host: the host address to set
+//   - port: the port number to set
+//
+// Returns:
+//   - ConnectionOption: a function that sets the host and port of a Connection struct
 func SetConnection(host string, port string) ConnectionOption {
 	return func(c *Connection) {
 		c.Host = host
@@ -73,9 +96,16 @@ func SetConnection(host string, port string) ConnectionOption {
 	}
 }
 
+// SetFallbackConnection is a function that returns a ConnectionOption.
+// It sets the fallback connection with the given host and port.
+// If both the host and port are provided, the fallback connection is added to the list of fallback connections.
+// The returned ConnectionOption function can be used to modify a Connection object.
+// The modified Connection object will have the fallback connection added if the host and port are provided.
 func SetFallbackConnection(host string, port string) ConnectionOption {
 	return func(c *Connection) {
+		// Check if both host and port are provided
 		if host != "" && port != "" {
+			// Add the fallback connection to the list of fallback connections
 			c.FallbackConnections = append(c.FallbackConnections, FallbackConnection{
 				Host: host,
 				Port: port,
@@ -84,6 +114,9 @@ func SetFallbackConnection(host string, port string) ConnectionOption {
 	}
 }
 
+// SetSSL is a function that returns a ConnectionOption function.
+// The returned function sets the SSL mode and certificates for a Connection.
+// It takes in the SSL mode, CA certificate, public certificate, and private key as arguments.
 func SetSSL(mode SSLMode, caCertificate, publicCertificate, privateKey string) ConnectionOption {
 	return func(c *Connection) {
 		c.SSLMode = mode

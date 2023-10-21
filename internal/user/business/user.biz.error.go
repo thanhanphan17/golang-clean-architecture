@@ -1,16 +1,16 @@
-package biz
+package business
 
 import (
 	cerr "go-clean-architecture/common/error"
 	"net/http"
 )
 
-func ErrPasswordIsNotValid(err error) *cerr.AppError {
+func ErrInvalidInfo(err error) *cerr.AppError {
 	return cerr.NewCustomError(
 		http.StatusBadRequest,
 		err,
-		"password must have from 8 to 30 characters",
-		"ErrWrongPassword",
+		"email or password not correct",
+		"ErrInvalidInfo",
 	)
 }
 
@@ -23,12 +23,39 @@ func ErrEmailIsNotValid(err error) *cerr.AppError {
 	)
 }
 
+func ErrEmailIsNotExisted(err error) *cerr.AppError {
+	return cerr.NewCustomError(
+		http.StatusBadRequest,
+		err,
+		"email is not existed",
+		"ErrNotExistedEmail",
+	)
+}
+
 func ErrEmailHasExisted(err error) *cerr.AppError {
 	return cerr.NewCustomError(
 		http.StatusBadRequest,
 		err,
 		"email has existed",
 		"ErrExistedEmail",
+	)
+}
+
+func ErrEmailNotVerified(err error) *cerr.AppError {
+	return cerr.NewCustomError(
+		http.StatusBadRequest,
+		err,
+		"email has not been verified",
+		"ErrEmailHasNotVerified",
+	)
+}
+
+func ErrEmailAlreadyVerified(err error) *cerr.AppError {
+	return cerr.NewCustomError(
+		http.StatusBadRequest,
+		err,
+		"email has been verified already",
+		"ErrEmailAlreadyVerified",
 	)
 }
 
@@ -50,20 +77,11 @@ func ErrFullNameTooLong(err error) *cerr.AppError {
 	)
 }
 
-func ErrPhoneHasNotVerified(err error) *cerr.AppError {
+func ErrInvalidOTP(err error) *cerr.AppError {
 	return cerr.NewCustomError(
 		http.StatusBadRequest,
 		err,
-		"phone has not been verified",
-		"ErrPhoneHasNotVerified",
-	)
-}
-
-func ErrPhoneHasExisted(err error) *cerr.AppError {
-	return cerr.NewCustomError(
-		http.StatusBadRequest,
-		err,
-		"ErrPhoneHasExisted",
-		"ErrPhoneHasExisted",
+		"otp is not valid",
+		"ErrInvalidOTP",
 	)
 }

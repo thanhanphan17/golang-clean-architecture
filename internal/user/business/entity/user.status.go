@@ -3,11 +3,11 @@ package entity
 type UserStatus int
 
 const (
-	ACTIVE UserStatus = iota
-	INACTIVE
+	INACTIVE UserStatus = iota
+	ACTIVE
 	BLOCK
 	VERIFIED
-	NOT_VERIFIED
+	UNVERIFIED
 )
 
 func (status UserStatus) Value() string {
@@ -20,8 +20,8 @@ func (status UserStatus) Value() string {
 		return "block"
 	case VERIFIED:
 		return "verified"
-	case NOT_VERIFIED:
-		return "not_verified"
+	case UNVERIFIED:
+		return "unverified"
 	}
 	return ""
 }

@@ -7,13 +7,14 @@ import (
 )
 
 type userRepoFinder interface {
-	FindUserByID(ctx context.Context, userID string) (*entity.User, error)
-	FindUserByPhone(ctx context.Context, phone string) (*entity.User, error)
-	FindUsers(ctx context.Context, filter entity.User, page, limit int) (paging.Pagination, error)
+	FindUserByCondition(ctx context.Context,
+		condition map[string]interface{}, preloadKey ...string) (*entity.User, error)
+	FindAllUsers(ctx context.Context, filter *entity.Filter,
+		pagination *paging.Pagination) (*paging.Pagination, error)
 }
 
 type userRepoWriter interface {
-	CreateUser(ctx context.Context, usrentity entity.User) (*entity.User, error)
+	CreateUser(ctx context.Context, userEntity entity.User) (*entity.User, error)
 	VerifyUser(ctx context.Context, userID string) error
 	UpdateUser(ctx context.Context, user entity.User) (*entity.User, error)
 }

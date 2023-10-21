@@ -42,7 +42,7 @@ func Send(to, subject, templatePath string, data interface{}) error {
 
 	var msgs []string
 
-	msgs = append(msgs, "From: Golang Clean Architecture<"+cfg.MailFrom+">\r")
+	msgs = append(msgs, "From: Microlab<"+cfg.MailFrom+">\r")
 	msgs = append(msgs, "To: "+to+"\r")
 	msgs = append(msgs, "Subject: "+subject+"\r")
 	msgs = append(msgs, "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n")

@@ -8,7 +8,7 @@ func NewValidator() *validator.Validate {
 	validatorRequest := validator.New()
 
 	validatorRequest.RegisterValidation("password", PasswordValidator)
-	validatorRequest.RegisterValidation("vnphone", PhoneValidator)
+	validatorRequest.RegisterValidation("vnphone", VNPhoneValidator)
 
 	return validatorRequest
 }

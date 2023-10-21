@@ -21,3 +21,6 @@ compose_down:
 local:
 	@go run cmd/main.go -config ./config/env -env=local -upgrade=${m}
 
+prod:
+	@go run cmd/main.go -config ./config/env -env=prod -upgrade=${m}
+

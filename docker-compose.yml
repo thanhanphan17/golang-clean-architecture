@@ -14,7 +14,7 @@ services:
       - "5432:5432"
 
     networks:
-      - localnet
+      - local_net
 
   app:
     container_name: go-clean-architecture
@@ -32,7 +32,7 @@ services:
       - "8888:8888"
 
     networks:
-      - localnet
+      - local_net
 
 networks:
-  localnet:
+  local_net:
